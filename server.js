@@ -13,6 +13,7 @@ const server = net.createServer(client => {
   console.log("client connected");
   client.setEncoding("utf8");
   client.on("data", data => {
+    console.log(data);
     request(data, client);
   });
 });
@@ -27,8 +28,15 @@ const request = (data, client) => {
   const OK = "HTTP/1.1 200 OK";
   const NOT_FOUND = "HTTP/1.1 404 NOT FOUND";
   let status;
+  let contentType;
 
   const checkURI = key => {
+    console.log(key);
+    if (key === "/css/styles.css") {
+      contentType = "text/css";
+    } else {
+      contentType = "text/html";
+    }
     if (files[key]) {
       status = OK;
       return files[key];
@@ -40,7 +48,7 @@ const request = (data, client) => {
 
   const bodyMsg = uri => {
     const body = checkURI(uri);
-    const message = `${status}\n Server: ${serverName}\n Date: ${date}\n\n${body}`;
+    const message = `${status}\nServer: ${serverName}\nDate: ${date} \nContent-Type: ${contentType}\n\n${body}`;
     client.write(message);
   };
 
